@@ -1,5 +1,6 @@
 package ltd.cqut.controller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Controller;
@@ -41,16 +42,22 @@ public class UpanddownController {
     @RequestMapping(value = "upload",method = RequestMethod.POST)
     public String upload(MultipartFile multipartFile, HttpServletRequest request) throws IOException {
         System.out.println("路径 = " + request.getSession().getServletContext().getRealPath("/"));//获取项目根路径
-        System.out.println("文件名 = " + multipartFile.getOriginalFilename());
-        System.out.println("文件类型 = " + multipartFile.getContentType());
+        System.err.println("文件名 = " + multipartFile.getOriginalFilename());
+        System.err.println("文件参数名" + multipartFile.getName());
+        System.err.println("文件类型 = " + multipartFile.getContentType());
         System.out.println("文件大小 = " + multipartFile.getSize());
         String realPath = request.getSession().getServletContext().getRealPath("/files");
         File file = new File(realPath, new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         if(!file.exists()) file.mkdirs();
         String originalFilename = multipartFile.getOriginalFilename();
-        String extension = FilenameUtils.getExtension(originalFilename);
+        String extension = FilenameUtils.getExtension(originalFilename);//得到后缀名
+        System.out.println("后缀名" + extension);
+        //将multipartFile转为输入流
+        //InputStream inputStream = multipartFile.getInputStream();
+        //调用服务器工具类，将字节输入流传入，上传文件到服务器
         String newName = UUID.randomUUID().toString().replaceAll("-", "") + new SimpleDateFormat("YYYYMMddHHmmss").format(new Date()) + "." + extension;
         multipartFile.transferTo(new File(file, newName));
+        //为什么不用tracsferto直接上传文件呢?
         return "redirect:/index.jsp";
     }
 
